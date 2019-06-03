@@ -1,15 +1,15 @@
 # Set working directory
-setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Lea/HiCProConfig")
-setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Tim/HiC_Mai")
+# setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Lea/HiCProConfig")
+# setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Tim/HiC_Mai")
 
 #######################################################################################################
-# Purpose:  Take a region of interest (ROI) and expand it by finding the genomic coordinates 
+# Purpose:  Take a region of interest (ROI) and expand it by finding the genomic coordinates
 # upstream and downstream of that fragment that includes 4 restriction enzyme cutting sites.
 # Send output to a date frame that includes 1, 2, 3, & 4 restriction enzyme sites.
 # See schemaitc diagram below.
 # -- NOTE:  On the downstream side of the ROI, the whole restriction fragment is not included in the
-# -- output coordinates but only its 'start' coordinate.  However, on the upstream side of the ROI, 
-# -- the whole restriction fragment is included in the output.  
+# -- output coordinates but only its 'start' coordinate.  However, on the upstream side of the ROI,
+# -- the whole restriction fragment is included in the output.
 #######################################################################################################
 
 ############################################################
@@ -17,7 +17,7 @@ setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Tim/HiC_Mai")
 # restrction enzyme cut sites.
 ############################################################
 
-# '|' defines boundaries of ROI's and restriction fragments 
+# '|' defines boundaries of ROI's and restriction fragments
 # '^' indicates restriction enzyme cut site
 
 # |_^___|_^___|_^___|_^___|__________________________|_^___|_^___|_^___|_^___|
@@ -30,7 +30,7 @@ setwd("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Tim/HiC_Mai")
 ############################
 # Data File 1:  User defined list of genomic regions of interest (ROI) in 'bed' format (chr# start end)
 #                                                                                      (e.g. chr6 1234567 3456789)
-# Data File 2:  Genomic coordinate list of restriction enzyme cut fragments in 'bed' format, same as above.  (In this first case, 
+# Data File 2:  Genomic coordinate list of restriction enzyme cut fragments in 'bed' format, same as above.  (In this first case,
 # the restriction fragments were from DpnII) and was generated using the "digest.genome.py" utility in the "hic-pro" tool
 # (https://nservant.github.io/HiC-Pro/).  A copy of this file can be found at /Volumes/ifs/DCEG/Branches/LTG/Chanock/Lea/HiCProConfig.
 
@@ -46,8 +46,8 @@ enz_fragment <- read.delim("/Volumes/ifs/DCEG/Branches/LTG/Chanock/Lea/HiCProCon
 
 #################################################################################################################################
 # Begin FUNCTION
-# Function for looping through Data File 2, the 'bed' file of DpnII genome-wide restriction fragments using input from region 
-# of interest (ROI).  Input into this function is chromosome number, genomic start coordinate, genomic stop coordinate 
+# Function for looping through Data File 2, the 'bed' file of DpnII genome-wide restriction fragments using input from region
+# of interest (ROI).  Input into this function is chromosome number, genomic start coordinate, genomic stop coordinate
 # for the ROI.
 #################################################################################################################################
 roi_expand <- function(chr_roi, start_roi, end_roi) {
@@ -56,13 +56,13 @@ roi_expand <- function(chr_roi, start_roi, end_roi) {
     # 1st 'if' statement to evaluate chromosome number
     if(chr_roi == enz_fragment$V1[i]) {
       # 2nd 'if' statement to evaluate genomic start coordinate
-      if(start_roi < enz_fragment$V2[i]) { 
+      if(start_roi < enz_fragment$V2[i]) {
         x <- data.frame(chr = chr_roi, start.0 = start_roi, start.1 = enz_fragment$V2[i-1], start.2 = enz_fragment$V2[i-2], start.3 = enz_fragment$V2[i-3], start.4 = enz_fragment$V2[i-4], stringsAsFactors = FALSE)
         break
-      # end if2  
-      } 
-  # end if1    
-    } 
+      # end if2
+      }
+  # end if1
+    }
   # end for1 loop
   }
 
@@ -71,18 +71,18 @@ roi_expand <- function(chr_roi, start_roi, end_roi) {
     if(end_roi < enz_fragment$V3[j]) {
       y <- data.frame(chr.a = chr_roi, end.0 = end_roi, end.1 = enz_fragment$V2[j+1], end.2 = enz_fragment$V2[j+2], end.3 = enz_fragment$V2[j+3], end.4 = enz_fragment$V2[j+4], stringsAsFactors = FALSE)
       break
-    # end if1  
+    # end if1
     }
-    
-  # end for2 loop  
+
+  # end for2 loop
   }
   # combine the two data frames; 'x' is from upstream of ROI; 'y' is from downstream of ROI
   z <- cbind(x,y)
   return(z)
-} 
+}
 ########################
 # End function
-########################  
+########################
 
 
 #######################################################################################
@@ -96,7 +96,7 @@ df_expand <- data.frame()
     chr_roi <- roi_list$V1[k]
    start_roi <- roi_list$V2[k]
     end_roi <- roi_list$V3[k]
-  
+
     # Function call
    df_tmp <- roi_expand(chr_roi, start_roi, end_roi)
     # Append to the bottom of the data frame 'df_expand'
